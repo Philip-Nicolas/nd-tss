@@ -1,7 +1,10 @@
-import random, numpy, math, matplotlib.pyplot as plt
+import math
+import matplotlib.pyplot as plt
+import numpy
+import random
 
 
-def validate_tsp_input(points):
+def validate_tsp_input(input_points):
     """ Validates list of points passed as input to solve_tsp.
         Ensures:
             - There are at least 2 points
@@ -10,19 +13,30 @@ def validate_tsp_input(points):
 
         Returns a tuple containing the list of points, the number of points, and the dimension of the points.
     """
-    n = len(points)
+    n = len(input_points)
     assert n >= 2
 
-    d = len(points[0])
+    d = len(input_points[0])
     assert d >= 1
     for i in range(n):
-        assert d == len(points[i])
+        assert d == len(input_points[i])
 
-    return points, n, d
+    return input_points, n, d
 
 
-def validate_and_solve_tsp(input_points):
+def validate_solve_tsp(input_points):
     return solve_tsp(*validate_tsp_input(input_points))
+
+
+def validate_solve_plot_tsp(input_points):
+    points, n, d = validate_tsp_input(input_points)
+    tour = solve_tsp(points, n, d)
+
+    ordered_points = get_tour_order(points, n, tour)
+
+    plot(ordered_points, n, d)
+    print("Distance:", get_loop_dist(ordered_points, n, d))
+    print("Path:", points)
 
 
 def solve_tsp(points, n, d):
@@ -49,10 +63,10 @@ def dist(points, d, i_1, i_2):
     return math.sqrt(sum([(points[i_1][e] - points[i_2][e]) ** 2 for e in range(d)]))
 
 
-def plot(points, n, d):
+def plot(ordered_points, n, d):
     assert 1 <= d <= 3
 
-    components = [get_components(*get_loop(points, n), e=e) for e in range(d)]
+    components = [get_components(*get_loop(ordered_points, n), e=e) for e in range(d)]
 
     if d == 3:
         axes = plt.axes(projection="3d")
@@ -72,7 +86,7 @@ def plot(points, n, d):
     else:
         plt.plot(*components, 'xb-')
 
-    plt.title("Distance: " + str(get_loop_dist(points, n, d)))
+    plt.title("Distance: " + str(get_loop_dist(ordered_points, n, d)))
     plt.show()
 
 
@@ -84,21 +98,19 @@ def get_tour_order(points, n, tour):
     return [points[tour[i]] for i in range(n)]
 
 
-def get_loop(points, n):
-    loop = points.copy()
-    loop.append(points[0])
+def get_loop(ordered_points, n):
+    loop = ordered_points.copy()
+    loop.append(ordered_points[0])
 
     return loop, n + 1
 
 
-def get_loop_dist(points, n, d):
-    return round(sum(dist(points, d, i, (i + 1) % n) for i in range(n)), 2)
+def get_loop_dist(ordered_points, n, d):
+    return round(sum(dist(ordered_points, d, i, (i + 1) % n) for i in range(n)), 2)
 
 
 count = 15
-dim = 2
+dim = 3
 
 cities = [random.sample(range(100), dim) for x in range(count)]
-cities_tour = validate_and_solve_tsp(cities)
-
-plot(get_tour_order(cities, count, cities_tour), count, dim)
+validate_solve_plot_tsp(cities)

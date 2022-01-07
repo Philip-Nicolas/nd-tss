@@ -1,4 +1,4 @@
-import random, numpy, math, copy, matplotlib.pyplot as plt
+import random, numpy, math, matplotlib.pyplot as plt
 
 
 # Adapted from https://ericphanson.com/blog/2016/the-traveling-salesman-and-10-lines-of-python/
@@ -9,14 +9,17 @@ def solve_tsp(pts):
     tour = list(range(0, n))
 
     for temp in numpy.logspace(0, 5, num=100000)[::-1]:
-        [i, j] = sorted(random.sample(range(n), 2))
-        new_tour = tour[:i] + tour[j:j + 1] + tour[i + 1:j] + tour[i:i + 1] + tour[j + 1:]
+        # Create a new tour by randomly swapping 2 points in the previous tour
+        [i, j] = sorted(random.sample(range(n), 2));
+        new_tour = tour.copy()
+        new_tour[j] = tour[i]
+        new_tour[i] = tour[j]
 
         old_distance = sum([dist(pts[tour[(k + 1) % n]], pts[tour[k % n]]) for k in [j, j - 1, i, i - 1]])
         new_distance = sum([dist(pts[new_tour[(k + 1) % n]], pts[new_tour[k % n]]) for k in [j, j - 1, i, i - 1]])
 
         if math.exp((old_distance - new_distance) / temp) > random.random():
-            tour = copy.copy(new_tour)
+            tour = new_tour.copy()
 
     return tour
 

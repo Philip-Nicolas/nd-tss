@@ -52,7 +52,7 @@ def dist(points, d, i_1, i_2):
 def plot(points, n, d):
     assert 1 <= d <= 3
 
-    components = [get_components(points, n, e) for e in range(d)]
+    components = [get_components(*get_loop(points, n), e=e) for e in range(d)]
 
     if d == 3:
         axes = plt.axes(projection="3d")
@@ -70,8 +70,9 @@ def plot(points, n, d):
         axes.plot3D(x, y, z, 'blue')
         axes.scatter3D(x, y, z, 'blue')
     else:
-        plt.plot(*[get_components(points, n, e) for e in range(d)], 'xb-')
+        plt.plot(*components, 'xb-')
 
+    plt.title("Distance: " + str(get_loop_dist(points, n, d)))
     plt.show()
 
 
@@ -83,8 +84,19 @@ def get_tour_order(points, n, tour):
     return [points[tour[i]] for i in range(n)]
 
 
+def get_loop(points, n):
+    loop = points.copy()
+    loop.append(points[0])
+
+    return loop, n + 1
+
+
+def get_loop_dist(points, n, d):
+    return round(sum(dist(points, d, i, (i + 1) % n) for i in range(n)), 2)
+
+
 count = 15
-dim = 3
+dim = 2
 
 cities = [random.sample(range(100), dim) for x in range(count)]
 cities_tour = validate_and_solve_tsp(cities)

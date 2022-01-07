@@ -1,4 +1,6 @@
 import math
+import time
+
 import matplotlib.pyplot as plt
 import numpy
 import random
@@ -26,11 +28,14 @@ def validate_tsp_input(input_points):
     return input_points, n, d
 
 
-def solve_tsp(points, n, d):
+def solve_tsp(points, n, d, compare_loops=False):
     # Adapted from https://ericphanson.com/blog/2016/the-traveling-salesman-and-10-lines-of-python/
     tour = list(range(0, n))
 
-    for temp in numpy.logspace(0, 5, num=100000)[::-1]:
+    best_dist = get_loop_dist(get_tour_order(points, n, tour), n, d)
+    best_tour = tour.copy()
+
+    for temp in numpy.logspace(-2, 4, num=100000)[::-1]:
         # Create a new tour by randomly swapping 2 points in the previous tour
         [i, j] = sorted(random.sample(range(n), 2))
         new_tour = tour.copy()
@@ -42,8 +47,10 @@ def solve_tsp(points, n, d):
 
         if math.exp((old_distance - new_distance) / temp) > random.random():
             tour = new_tour.copy()
+            if not compare_loops or best_dist > get_loop_dist(get_tour_order(points, n, tour), n, d):
+                best_tour = tour.copy()
 
-    ordered_points = get_tour_order(points, n, tour)
+    ordered_points = get_tour_order(points, n, best_tour)
     loop_dist = get_loop_dist(ordered_points, n, d)
 
     return ordered_points, loop_dist
@@ -79,8 +86,10 @@ def plot(ordered_points, n, d):
     plt.title("Distance: " + str(get_loop_dist(ordered_points, n, d)))
     plt.show()
 
+
 def present_tsp_input_summary(n, d):
     print("\nSolving", d, "dimension TSP with", n, "points.")
+
 
 def present_tsp_solution(ordered_points, loop_dist, n, d):
     if d <= 3:
@@ -132,7 +141,7 @@ def get_sample_input(points_count, dimension):
     return [random.sample(range(100), dimension) for _ in range(points_count)]
 
 
-def test_multiple_runs(initial_input_points):
+def test_multiple_runs(initial_input_points, compare_loops=False):
     input_points = initial_input_points
     runs = 0
     done = False
@@ -140,11 +149,17 @@ def test_multiple_runs(initial_input_points):
     while not done:
         points, n, d = validate_tsp_input(input_points)
         present_tsp_input_summary(n, d)
-        ordered_points, loop_dist = solve_tsp(points, n, d)
-        present_tsp_solution(ordered_points, loop_dist, n, d)
-
+        start_time = time.time()
+        ordered_points, loop_dist = solve_tsp(points, n, d, compare_loops)
+        end_time = time.time()
         runs += 1
-        input_points = ordered_points
+
+        if get_loop_dist(ordered_points, n, d) < get_loop_dist(input_points, n, d):
+            input_points = ordered_points
+
+        present_tsp_solution(ordered_points, loop_dist, n, d)
+        print("Runs:", runs)
+        print("Runtime:", str(round(end_time - start_time, 3)) + "s")
         done = input("Done? Type 'exit' to quit:") == "exit"
 
 
@@ -158,6 +173,6 @@ def test_multiple_runs(initial_input_points):
 # validate_solve_present_tsp(get_sample_input(16, 3))
 # validate_solve_present_tsp(get_sample_input(16, 4))
 
-test_multiple_runs(get_sample_input(16, 3))
+test_multiple_runs(get_sample_input(32, 3), False)
 
 # endregion

@@ -4,6 +4,8 @@ import numpy
 import random
 
 
+# region Solver
+
 def validate_tsp_input(input_points):
     """ Validates list of points passed as input to solve_tsp.
         Ensures:
@@ -24,21 +26,6 @@ def validate_tsp_input(input_points):
     return input_points, n, d
 
 
-def validate_solve_tsp(input_points):
-    return solve_tsp(*validate_tsp_input(input_points))
-
-
-def validate_solve_plot_tsp(input_points):
-    points, n, d = validate_tsp_input(input_points)
-    tour = solve_tsp(points, n, d)
-
-    ordered_points = get_tour_order(points, n, tour)
-
-    plot(ordered_points, n, d)
-    print("Distance:", get_loop_dist(ordered_points, n, d))
-    print("Path:", points)
-
-
 def solve_tsp(points, n, d):
     # Adapted from https://ericphanson.com/blog/2016/the-traveling-salesman-and-10-lines-of-python/
     tour = list(range(0, n))
@@ -56,12 +43,15 @@ def solve_tsp(points, n, d):
         if math.exp((old_distance - new_distance) / temp) > random.random():
             tour = new_tour.copy()
 
-    return tour
+    ordered_points = get_tour_order(points, n, tour)
+    loop_dist = get_loop_dist(ordered_points, n, d)
+
+    return tour, ordered_points, loop_dist
 
 
-def dist(points, d, i_1, i_2):
-    return math.sqrt(sum([(points[i_1][e] - points[i_2][e]) ** 2 for e in range(d)]))
+# endregion
 
+# region Presentation
 
 def plot(ordered_points, n, d):
     assert 1 <= d <= 3
@@ -90,6 +80,33 @@ def plot(ordered_points, n, d):
     plt.show()
 
 
+def validate_solve_present_tsp(input_points):
+    # validate & parse input points
+    points, n, d = validate_tsp_input(input_points)
+    print("\nSolving", d, "dimension TSP with", n, "points:")
+
+    # solve tsp
+    tour, ordered_points, loop_dist = solve_tsp(points, n, d)
+
+    # display output
+    if d <= 3:
+        plot(ordered_points, n, d)
+    print("Distance:", loop_dist)
+    print("Path:", ordered_points)
+
+
+# endregion
+
+# region Utilities
+
+def dist(points, d, i_1, i_2):
+    return math.sqrt(sum([(points[i_1][e] - points[i_2][e]) ** 2 for e in range(d)]))
+
+
+def get_loop_dist(ordered_points, n, d):
+    return round(sum(dist(ordered_points, d, i, (i + 1) % n) for i in range(n)), 2)
+
+
 def get_components(points, n, e):
     return [points[i][e] for i in range(n)]
 
@@ -105,12 +122,17 @@ def get_loop(ordered_points, n):
     return loop, n + 1
 
 
-def get_loop_dist(ordered_points, n, d):
-    return round(sum(dist(ordered_points, d, i, (i + 1) % n) for i in range(n)), 2)
+# endregion
 
 
-count = 15
-dim = 3
+# region Examples
 
-cities = [random.sample(range(100), dim) for x in range(count)]
-validate_solve_plot_tsp(cities)
+def example(points_count, dimension):
+    validate_solve_present_tsp([random.sample(range(100), dimension) for _ in range(points_count)])
+
+
+example(16, 2)
+example(16, 3)
+example(16, 4)
+
+# endregion

@@ -34,8 +34,8 @@ def solve_tsp(input_points):
         new_tour[j] = tour[i]
         new_tour[i] = tour[j]
 
-        old_distance = sum([dist(pts[tour[(k + 1) % n]], pts[tour[k % n]]) for k in [j, j - 1, i, i - 1]])
-        new_distance = sum([dist(pts[new_tour[(k + 1) % n]], pts[new_tour[k % n]]) for k in [j, j - 1, i, i - 1]])
+        old_distance = sum([dist(pts, d, tour[(k + 1) % n], tour[k % n]) for k in [j, j - 1, i, i - 1]])
+        new_distance = sum([dist(pts, d, new_tour[(k + 1) % n], new_tour[k % n]) for k in [j, j - 1, i, i - 1]])
 
         if math.exp((old_distance - new_distance) / temp) > random.random():
             tour = new_tour.copy()
@@ -43,8 +43,8 @@ def solve_tsp(input_points):
     return tour
 
 
-def dist(p1, p2):
-    return math.sqrt(sum([(p1[e] - p2[e]) ** 2 for e in range(len(p1))]))
+def dist(pts, d, i_1, i_2):
+    return math.sqrt(sum([(pts[i_1][e] - pts[i_2][e]) ** 2 for e in range(d)]))
 
 
 cities = [random.sample(range(100), 2) for x in range(15)]

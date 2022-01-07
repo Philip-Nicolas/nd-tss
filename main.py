@@ -52,7 +52,26 @@ def dist(points, d, i_1, i_2):
 def plot(points, n, d):
     assert 1 <= d <= 3
 
-    plt.plot(*[get_components(points, n, e) for e in range(d)], 'xb-')
+    components = [get_components(points, n, e) for e in range(d)]
+
+    if d == 3:
+        axes = plt.axes(projection="3d")
+        x, y, z = components
+
+        # Set 3D axis bounds
+        axes.set_xlim3d(min(x), max(x))
+        axes.set_ylim3d(min(y), max(y))
+        axes.set_zlim3d(min(z), max(z))
+
+        # Set 3D aspect ratio
+        axes.set_box_aspect([ub - lb for lb, ub in (getattr(axes, f'get_{a}lim')() for a in 'xyz')])
+
+        # plot points and connecting lines
+        axes.plot3D(x, y, z, 'blue')
+        axes.scatter3D(x, y, z, 'blue')
+    else:
+        plt.plot(*[get_components(points, n, e) for e in range(d)], 'xb-')
+
     plt.show()
 
 
@@ -60,7 +79,14 @@ def get_components(points, n, e):
     return [points[i][e] for i in range(n)]
 
 
-cities = [random.sample(range(100), 2) for x in range(15)]
+def get_tour_order(points, n, tour):
+    return [points[tour[i]] for i in range(n)]
+
+
+count = 15
+dim = 3
+
+cities = [random.sample(range(100), dim) for x in range(count)]
 cities_tour = validate_and_solve_tsp(cities)
 
-plot([cities[cities_tour[i % 15]] for i in range(16)], 15, 2)
+plot(get_tour_order(cities, count, cities_tour), count, dim)

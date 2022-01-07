@@ -4,6 +4,7 @@ import random, numpy, math, copy, matplotlib.pyplot as plt
 ## Adapted from https://ericphanson.com/blog/2016/the-traveling-salesman-and-10-lines-of-python/
 
 def solveTsp(pts):
+    validateTspInput(pts)
     n = len(pts)
     tour = list(range(0, n))
 
@@ -22,6 +23,14 @@ def solveTsp(pts):
             tour = copy.copy(newTour)
 
     return tour
+
+def validateTspInput(pts):
+    n = len(pts)
+    assert n > 1
+
+    d = len(pts[0])
+    for i in range(n):
+        assert d == len(pts[i])
 
 
 cities = [random.sample(range(100), 2) for x in range(15)]

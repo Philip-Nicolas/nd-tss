@@ -1,0 +1,17 @@
+# JetBrains IDE Config
+.idea/
+
+# macOS system files
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution
+build/
+
+# Environment
+.env
+venv/

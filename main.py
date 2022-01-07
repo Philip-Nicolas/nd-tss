@@ -46,7 +46,7 @@ def solve_tsp(points, n, d):
     ordered_points = get_tour_order(points, n, tour)
     loop_dist = get_loop_dist(ordered_points, n, d)
 
-    return tour, ordered_points, loop_dist
+    return ordered_points, loop_dist
 
 
 # endregion
@@ -79,20 +79,26 @@ def plot(ordered_points, n, d):
     plt.title("Distance: " + str(get_loop_dist(ordered_points, n, d)))
     plt.show()
 
+def present_tsp_input_summary(n, d):
+    print("\nSolving", d, "dimension TSP with", n, "points.")
 
-def validate_solve_present_tsp(input_points):
-    # validate & parse input points
-    points, n, d = validate_tsp_input(input_points)
-    print("\nSolving", d, "dimension TSP with", n, "points:")
-
-    # solve tsp
-    tour, ordered_points, loop_dist = solve_tsp(points, n, d)
-
-    # display output
+def present_tsp_solution(ordered_points, loop_dist, n, d):
     if d <= 3:
         plot(ordered_points, n, d)
     print("Distance:", loop_dist)
     print("Path:", ordered_points)
+
+
+def validate_solve_present_tsp(input_points):
+    # validate & parse input points
+    points, n, d = validate_tsp_input(input_points)
+    present_tsp_input_summary(n, d)
+
+    # solve tsp
+    ordered_points, loop_dist = solve_tsp(points, n, d)
+
+    # display solution
+    present_tsp_solution(ordered_points, loop_dist, n, d)
 
 
 # endregion
@@ -122,17 +128,36 @@ def get_loop(ordered_points, n):
     return loop, n + 1
 
 
+def get_sample_input(points_count, dimension):
+    return [random.sample(range(100), dimension) for _ in range(points_count)]
+
+
+def test_multiple_runs(initial_input_points):
+    input_points = initial_input_points
+    runs = 0
+    done = False
+
+    while not done:
+        points, n, d = validate_tsp_input(input_points)
+        present_tsp_input_summary(n, d)
+        ordered_points, loop_dist = solve_tsp(points, n, d)
+        present_tsp_solution(ordered_points, loop_dist, n, d)
+
+        runs += 1
+        input_points = ordered_points
+        done = input("Done? Type 'exit' to quit:") == "exit"
+
+
 # endregion
 
 
 # region Examples
 
-def example(points_count, dimension):
-    validate_solve_present_tsp([random.sample(range(100), dimension) for _ in range(points_count)])
 
+# validate_solve_present_tsp(get_sample_input(16, 2))
+# validate_solve_present_tsp(get_sample_input(16, 3))
+# validate_solve_present_tsp(get_sample_input(16, 4))
 
-example(16, 2)
-example(16, 3)
-example(16, 4)
+test_multiple_runs(get_sample_input(16, 3))
 
 # endregion

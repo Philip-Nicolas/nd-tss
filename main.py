@@ -21,10 +21,12 @@ def validate_tsp_input(pts):
     return pts, n, d
 
 
-# Adapted from https://ericphanson.com/blog/2016/the-traveling-salesman-and-10-lines-of-python/
+def validate_and_solve_tsp(input_points):
+    return solve_tsp(*validate_tsp_input(input_points))
 
-def solve_tsp(input_points):
-    pts, n, d = validate_tsp_input(input_points)
+
+def solve_tsp(pts, n, d):
+    # Adapted from https://ericphanson.com/blog/2016/the-traveling-salesman-and-10-lines-of-python/
     tour = list(range(0, n))
 
     for temp in numpy.logspace(0, 5, num=100000)[::-1]:
@@ -48,7 +50,7 @@ def dist(pts, d, i_1, i_2):
 
 
 cities = [random.sample(range(100), 2) for x in range(15)]
-cities_tour = solve_tsp(cities)
+cities_tour = validate_and_solve_tsp(cities)
 
 plt.plot([cities[cities_tour[i % 15]][0] for i in range(16)], [cities[cities_tour[i % 15]][1] for i in range(16)],
          'xb-')

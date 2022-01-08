@@ -35,7 +35,7 @@ def solve_tsp(points, n, d, compare_loops=False):
     best_dist = get_loop_dist(get_tour_order(points, n, tour), n, d)
     best_tour = tour.copy()
 
-    for temp in numpy.logspace(-2, 4, num=100000)[::-1]:
+    for temp in numpy.logspace(-2, 5, num=120000)[::-1]:
         # Create a new tour by randomly swapping 2 points in the previous tour
         [i, j] = sorted(random.sample(range(n), 2))
         new_tour = tour.copy()
@@ -45,9 +45,14 @@ def solve_tsp(points, n, d, compare_loops=False):
         old_distance = sum([dist(points, d, tour[(k + 1) % n], tour[k % n]) for k in [j, j - 1, i, i - 1]])
         new_distance = sum([dist(points, d, new_tour[(k + 1) % n], new_tour[k % n]) for k in [j, j - 1, i, i - 1]])
 
-        if math.exp((old_distance - new_distance) / temp) > random.random():
+        if new_distance < old_distance or math.exp((old_distance - new_distance) / temp) > random.random():
             tour = new_tour.copy()
-            if not compare_loops or best_dist > get_loop_dist(get_tour_order(points, n, tour), n, d):
+            if compare_loops:
+                new_dist = get_loop_dist(get_tour_order(points, n, tour), n, d)
+                if new_dist < best_dist:
+                    best_tour = tour.copy()
+                    best_dist = new_dist
+            else:
                 best_tour = tour.copy()
 
     ordered_points = get_tour_order(points, n, best_tour)
@@ -154,7 +159,7 @@ def test_multiple_runs(initial_input_points, compare_loops=False):
         end_time = time.time()
         runs += 1
 
-        if get_loop_dist(ordered_points, n, d) < get_loop_dist(input_points, n, d):
+        if loop_dist < get_loop_dist(input_points, n, d):
             input_points = ordered_points
 
         present_tsp_solution(ordered_points, loop_dist, n, d)

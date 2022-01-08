@@ -79,7 +79,7 @@ def plot(ordered_points, n, d):
 
         # plot points and connecting lines
         axes.plot3D(x, y, z, 'blue')
-        axes.scatter3D(x, y, z, 'blue')
+        axes.scatter3D(x, y, z, 'blue', depthshade=True)
     else:
         plt.plot(*components, 'xb-')
 
@@ -169,10 +169,10 @@ def test_multiple_runs(initial_input_points, compare_loops=False):
 # region Examples
 
 
-# validate_solve_present_tsp(get_sample_input(16, 2))
-# validate_solve_present_tsp(get_sample_input(16, 3))
-# validate_solve_present_tsp(get_sample_input(16, 4))
+validate_solve_present_tsp(get_sample_input(16, 2))
+validate_solve_present_tsp(get_sample_input(16, 3))
+validate_solve_present_tsp(get_sample_input(16, 4))
 
-test_multiple_runs(get_sample_input(32, 3), False)
+test_multiple_runs(get_sample_input(24, 3), True)
 
 # endregion

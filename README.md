@@ -1,5 +1,5 @@
 # nd-tss
-n-dimensional travellling salseman problem solver
+n-dimensional travellling salseperson problem solver
 
 
 * Uses a simulated annealing approach based on this [blog post](https://ericphanson.com/blog/2016/the-traveling-salesman-and-10-lines-of-python/) at ericphanson.com.
